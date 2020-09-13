@@ -1,29 +1,31 @@
 For building the project
+--------------------------
 mvn clean install
 
 For creating the Docker image
+--------------------------
 mvn fabric8:build
 
 To create the openshift resource descriptor, run command
+--------------------------
 mvn fabric8:resource 
 
-To push the docker image generated via mvn docker:build to either the global docker registry
-or a local docker registry.
+To push the docker image generated via mvn docker:build to either the global docker registry or a local docker registry.
+--------------------------
 mvn fabric8:push
-
 
 Reference:
 https://fabric8.io/guide/mavenDockerBuild.html
 
 Common oc commands
 --------------------------
-oc new-project spring-boot-docker-openshift-hello-world
-oc project <spring-boot-hello-world>
-oc login
-oc apply -f apache_root_pod.yml
-oc get pods
-oc logs -f apache
-oc pod delete apache
+`oc new-project spring-boot-docker-openshift-hello-world
+`oc project <spring-boot-hello-world>
+`oc login
+`oc apply -f apache_root_pod.yml
+`oc get pods
+`oc logs -f apache
+`oc pod delete apache
 
 Common Docker commands
 --------------------------
