@@ -19,13 +19,13 @@ https://fabric8.io/guide/mavenDockerBuild.html
 
 Common oc commands
 --------------------------
-`oc new-project spring-boot-docker-openshift-hello-world
-`oc project <spring-boot-hello-world>
-`oc login
-`oc apply -f apache_root_pod.yml
-`oc get pods
-`oc logs -f apache
-`oc pod delete apache
+`oc new-project spring-boot-docker-openshift-hello-world`\
+`oc project <spring-boot-hello-world>`\
+`oc login`\
+`oc apply -f apache_root_pod.yml`\
+`oc get pods`\
+`oc logs -f apache`\
+`oc pod delete apache`\
 
 Common Docker commands
 --------------------------
