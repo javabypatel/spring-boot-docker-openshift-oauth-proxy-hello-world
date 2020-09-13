@@ -1,0 +1,99 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: deployment-template
+objects:
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: proxy
+      annotations:
+        serviceaccounts.openshift.io/oauth-redirectreference.primary: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"my-route"}}'
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: my-service
+      annotations:
+        service.alpha.openshift.io/serving-cert-secret-name: proxy-tls
+    spec:
+      selector:
+        app: spring-boot-docker-openshift-hello-world
+      ports:
+        - name: api
+          protocol: TCP
+          port: 443 #Port the service listens on.
+          targetPort: 8443 #Port on the backing pods to which the service forwards connections.
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: my-route
+    spec:
+      port:
+        targetPort: api
+      to:
+        kind: Service
+        name: my-service
+      tls:
+        termination: Reencrypt
+  - apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: spring-boot-docker-openshift-hello-world
+        version: 0.0.1-SNAPSHOT
+      name: spring-boot-docker-openshift-hello-world
+    spec:
+      replicas: 1
+      selector:
+        app: spring-boot-docker-openshift-hello-world
+      strategy:
+        rollingParams:
+          timeoutSeconds: 3600
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: spring-boot-docker-openshift-hello-world
+            version: 0.0.1-SNAPSHOT
+        spec:
+          serviceAccountName: proxy
+          containers:
+          - name: spring-boot-docker-openshift-hello-world
+            env:
+              - name: KUBERNETES_NAMESPACE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+            image: pokarjm/spring-boot-docker-openshift-hello-world:0.0.1-SNAPSHOT.dev
+            imagePullPolicy: IfNotPresent
+            securityContext:
+              privileged: false
+            ports:
+              - containerPort: 8080
+                protocol: TCP
+          - name: oauth-proxy
+            image: openshift/oauth-proxy:latest
+            imagePullPolicy: IfNotPresent
+            ports:
+              - containerPort: 8443
+                name: public
+            args:
+              - --https-address=:8443
+              - --provider=openshift
+              - --openshift-service-account=proxy
+              - --upstream=http://localhost:8080
+              - --tls-cert=/etc/tls/private/tls.crt
+              - --tls-key=/etc/tls/private/tls.key
+              - --cookie-secret=SECRET
+              - --openshift-review-url=https://openshift.default.svc/apis/authorization.openshift.io/v1/subjectaccessreviews
+              - --redeem-url=https://openshift.default.svc/oauth/token
+              - --validate-url=https://openshift.default.svc/apis/user.openshift.io/v1/users/~
+            volumeMounts:
+              - mountPath: /etc/tls/private
+                name: proxy-tls
+          volumes:
+            - name: proxy-tls
+              secret:
+                secretName: proxy-tls
+      triggers:
+        - type: ConfigChange
