@@ -85,9 +85,6 @@ objects:
               - --tls-cert=/etc/tls/private/tls.crt
               - --tls-key=/etc/tls/private/tls.key
               - --cookie-secret=SECRET
-              - --openshift-review-url=https://openshift.default.svc/apis/authorization.openshift.io/v1/subjectaccessreviews
-              - --redeem-url=https://openshift.default.svc/oauth/token
-              - --validate-url=https://openshift.default.svc/apis/user.openshift.io/v1/users/~
             volumeMounts:
               - mountPath: /etc/tls/private
                 name: proxy-tls
