@@ -29,7 +29,7 @@ Common oc commands
 
 Common Docker commands
 --------------------------
-For tagging the docker image before pushing it to repo
+For tagging the docker image before pushing it to repo\
 `docker tag <image_name:image_tag> <docker_username>/<image_name:image_tag>`\
 `docker tag spring-boot-docker-openshift-hello-world:0.0.1-SNAPSHOT.dev pokarjm/spring-boot-docker-openshift-hello-world:0.0.1-SNAPSHOT.dev`\
 `docker push pokarjm/spring-boot-docker-openshift-hello-world`
